@@ -191,6 +191,22 @@ def finish_command(args):
         # Create output dir if needed
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # Reset working directory to only include staged/committed changes
+        # Discard unstaged modifications
+        subprocess.run(
+            ["git", "checkout", "--", "."],
+            cwd=temp_repo,
+            check=True,
+            capture_output=True,
+        )
+        # Remove untracked files
+        subprocess.run(
+            ["git", "clean", "-fd"],
+            cwd=temp_repo,
+            check=True,
+            capture_output=True,
+        )
+
         # Copy repo state to output (excluding .git)
         print("Copying repository state to output directory...")
         subprocess.run(
